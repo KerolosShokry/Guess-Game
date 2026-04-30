@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 class="game-title">The Guessing Game</h1>
+<div id="Setup">
+    <label>Enter Your Name :</label>
+    <br>
+    <input id="name" type="text" placeholder="Enter Your Name" autofocus>
+
+    <p>Choose Difficulty:</p>
+
+    <div>
+        <input id="easy" type="radio" name="difficulty" value="easy" checked>
+        <label for="easy">easy</label>
+    </div>
+
+    <br>
+
+    <div>
+        <input id="medium" type="radio" name="difficulty" value="medium">
+        <label for="medium">medium</label>
+    </div>
+
+    <br>
+
+    <div>
+        <input id="hard" type="radio" name="difficulty" value="hard">
+        <label for="hard">Hard</label>
+    </div>
+
+    <p>Max Number :</p>
+    <input type="range" id="max-range" max="100" value="50">
+    <span id="range-val">50</span>
+
+    <br><br>
+
+    <button id="start-G">Start Game</button>
+</div>
+
+
+<div id="gameplay" style="display: none;">
+<h2 id="welcome-msg"> Welcome Player :  </h2>
+<p id="range-info">The number is between 0 and 100 </p>
+<p>Current number of attempts left is : <span id="attempts-left">10</span></p>
+
+<div>
+    <label>Your Guess : </label>
+    <input type="number" id="user-guess" placeholder="Enter a number">
+    <button id="check-btn">Check</button>
+</div>
+
+<p id="feedback"></p>
+<div id="finish-options" style="display:none">
+    <button id="try-Again">Try again with Your current setting</button>
+    <button id="change-difficulty">change difficulty </button>    
+</div>
+    </div>
+
+<script>
+let randomNumber;
+let attemptsleft;
+
+const SetupDiv = document.getElementById('Setup')
+const gameplayDiv = document.getElementById('gameplay')
+const StartBtn = document.getElementById('start-G')
+const maxRange = document.getElementById('max-range')
+const rangeVal = document.getElementById('range-val')
+const attemptsSpan = document.getElementById('attempts-left')
+const checkBtn = document.getElementById('check-btn');
+const feedback = document.getElementById('feedback');
+
+maxRange.addEventListener('input' , function() {
+    rangeVal.textContent = maxRange.value
+});
+
+StartBtn.addEventListener('click', function() {
+const name = document.getElementById('name').value;
+const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+
+if (name === "") {
+    alert("Please Enter Your Name First : ")
+    return;
+}
+
+if (difficulty === "easy") {
+    attemptsleft = 10;
+}
+else if (difficulty ==="medium") {
+    attemptsleft = 5;
+}
+else if (difficulty === "hard") {
+    attemptsleft = 3;
+}
+const maxNum = parseInt(maxRange.value);
+randomNumber = Math.floor(Math.random() * (maxNum + 1));
+
+document.getElementById('welcome-msg').textContent = "Welcome Player : " + name;
+document.getElementById('range-info').textContent = "The Number is Between 0 and " + maxNum;
+attemptsSpan.textContent = attemptsleft;
+
+SetupDiv.style.display = 'none';
+gameplayDiv.style.display = 'block';
+document.getElementById('feedback').textContent = "";
+});
+
+ checkBtn.addEventListener('click' , function() {
+    const userGuess = parseInt(document.getElementById('user-guess').value);
+
+    if (isNaN(userGuess)) {
+        feedback.textContent = "Please Enter a Valid Number : " ;
+        return;
+    }
+const maxNum = parseInt(maxRange.value);
+
+if (userGuess < 0 || userGuess > maxNum) {
+    feedback.textContent = "Enter a number between 0 and " + maxNum;
+    return;
+}
+
+attemptsleft--;
+attemptsSpan.textContent = attemptsleft;
+
+
+if (userGuess === randomNumber) {
+    feedback.textContent = "Congratulations On winning the game , The Number was : " + randomNumber;
+    document.getElementById('finish-options').style.display = 'block'; 
+    checkBtn.disabled = true;
+}
+else if (attemptsleft === 0) {
+    feedback.textContent = "No more Attempts Available , The Number Was : " + randomNumber + " You Lost";
+    document.getElementById('finish-options').style.display = 'block';
+    checkBtn.disabled = true;
+}
+else if (userGuess > randomNumber) {
+    feedback.textContent = "Your Guess is higher Than The The number go lower ";
+}
+else {
+    feedback.textContent = "Your Guess is Lower Than The The number go Higher ";
+}
+});
+
+const tryAgainBtn = document.getElementById('try-Again');
+const changeDiffBtn = document.getElementById('change-difficulty');
+
+tryAgainBtn.addEventListener('click', function() {
+    const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+    if (difficulty === "easy") attemptsleft = 10;
+    else if (difficulty === "medium") attemptsleft = 5;
+    else attemptsleft = 3;
+
+    const maxNum = parseInt(maxRange.value);
+    randomNumber = Math.floor(Math.random() * (maxNum + 1));
+    attemptsSpan.textContent = attemptsleft;
+    feedback.textContent = "";
+    document.getElementById('user-guess').value = ""; 
+    checkBtn.disabled = false; 
+document.getElementById('finish-options').style.display = 'none';
+});
+
+changeDiffBtn.addEventListener('click', function() {
+    gameplayDiv.style.display = 'none';
+    SetupDiv.style.display = 'block';
+    checkBtn.disabled = false;
+    document.getElementById('user-guess').value = "";
+});
+</script>
+</body>
+</html>
